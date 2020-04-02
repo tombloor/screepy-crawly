@@ -1,5 +1,5 @@
 import { ErrorMapper } from "utils/ErrorMapper";
-import { spawn } from "child_process";
+import { Miner } from "roles/miner";
 
 console.log('New global loaded');
 
@@ -18,11 +18,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
 	let spawn = Game.spawns['Spawn1'];
 	let room = spawn.room;
 
-	const miner_role = 'miner';
-	let miner_body = [MOVE, WORK];
-	let miners = _.filter(Game.creeps, (c) => {
-		return c.memory['role'] == miner_role;
-	});
+	let miners = Miner.get_active();
 
 	const hauler_role = 'hauler';
 	let hauler_body = [MOVE, CARRY];
@@ -42,18 +38,9 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
 	if (spawn.spawning == null) {
 		if (miners.length < 1) {
-			console.log('No miners, spawning one.');
-			let result = spawn.spawnCreep(miner_body, 'Miner1', {
-				memory: { role: miner_role, working: false }
-			});
-
-			if (result == OK) {
-				console.log('Spawning successful');
-			} else {
-				console.log('Unable to spawn: ' + result.toString())
-			}
+			Miner.spawn(spawn);
 		}
-		else if (haulers.length < 1) {
+		else if (haulers.length < 2) {
 			console.log('no haulers, spawning one.');
 			let result = spawn.spawnCreep(hauler_body, 'Hauler1', {
 				memory: { role: hauler_role, working: false }
@@ -61,7 +48,12 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
 			if (result == OK) {
 				console.log('Spawning successful');
-			} else {
+			} else if (result == ERR_NAME_EXISTS) {
+				spawn.spawnCreep(hauler_body, 'Hauler2', {
+					memory: { role: hauler_role, working: false }
+				});
+			}
+			else {
 				console.log('Unable to spawn: ' + result.toString())
 			}
 		}
@@ -94,13 +86,9 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
 		console.log(creep.name + ' (' + role + ')');
 
-		if (role == miner_role) {
-			console.log(creep.name + ' mining');
-			if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-				creep.moveTo(source);
-			} else {
-				creep.memory.working = true;
-			}
+		if (role == Miner.role_name) {
+			let miner = new Miner(creep);
+			miner.run();
 		} else if (role == hauler_role) {
 			console.log(creep.name + '  hauling');
 			if (creep.memory.working) {
