@@ -1,5 +1,6 @@
 import { ErrorMapper } from "utils/ErrorMapper";
 import { Miner } from "roles/miner";
+import { Hauler } from "roles/hauler";
 
 console.log('New global loaded');
 
@@ -20,11 +21,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
 	let miners = Miner.get_active();
 
-	const hauler_role = 'hauler';
-	let hauler_body = [MOVE, CARRY];
-	let haulers = _.filter(Game.creeps, (c) => {
-		return c.memory['role'] == hauler_role;
-	});
+	let haulers = Hauler.get_active();
 
 	const upgrader_role = 'upgrader';
 	let upgrader_body = [MOVE, CARRY, CARRY, WORK];
@@ -41,21 +38,7 @@ export const loop = ErrorMapper.wrapLoop(() => {
 			Miner.spawn(spawn);
 		}
 		else if (haulers.length < 2) {
-			console.log('no haulers, spawning one.');
-			let result = spawn.spawnCreep(hauler_body, 'Hauler1', {
-				memory: { role: hauler_role, working: false }
-			});
-
-			if (result == OK) {
-				console.log('Spawning successful');
-			} else if (result == ERR_NAME_EXISTS) {
-				spawn.spawnCreep(hauler_body, 'Hauler2', {
-					memory: { role: hauler_role, working: false }
-				});
-			}
-			else {
-				console.log('Unable to spawn: ' + result.toString())
-			}
+			Hauler.spawn(spawn);
 		}
 		else if (upgraders.length < 2) {
 			console.log('no upgraders, spawning one.');
@@ -82,38 +65,13 @@ export const loop = ErrorMapper.wrapLoop(() => {
 
 	_.forEach(Game.creeps, (creep) => {
 		let role = creep.memory['role'];
-		let working = creep.memory['working'];
-
-		console.log(creep.name + ' (' + role + ')');
 
 		if (role == Miner.role_name) {
 			let miner = new Miner(creep);
 			miner.run();
-		} else if (role == hauler_role) {
-			console.log(creep.name + '  hauling');
-			if (creep.memory.working) {
-				let transfer_result = creep.transfer(spawn, RESOURCE_ENERGY);
-				console.log('Haul transfer result:' + transfer_result);
-				if (transfer_result == ERR_NOT_IN_RANGE) {
-					creep.moveTo(spawn);
-				} else {
-					creep.memory.working = false;
-				}
-			} else {
-				let target = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES);
-				if (target) {
-					if (creep.pickup(target) == ERR_NOT_IN_RANGE) {
-						creep.moveTo(target);
-					}
-				} else {
-					console.log('No resources to collect');
-				}
-			}
-
-			let free_cap = creep.store.getFreeCapacity(RESOURCE_ENERGY);
-			if (free_cap == 0) {
-				creep.memory.working = true;
-			}
+		} else if (role == Hauler.role_name) {
+			let hauler = new Hauler(creep);
+			hauler.run();
 		} else if (role == upgrader_role) {
 			console.log(creep.name + '  upgrading');
 			if (creep.memory.working) {
