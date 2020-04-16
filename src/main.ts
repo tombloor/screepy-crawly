@@ -3,11 +3,18 @@ import { Miner } from "roles/miner";
 import { Hauler } from "roles/hauler";
 import { Upgrader } from "roles/upgrader";
 
+import { Kernel } from "os/kernel";
+
 console.log('New global loaded');
 
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
 export const loop = ErrorMapper.wrapLoop(() => {
+	let kernel = new Kernel();
+	kernel.load_state();
+	// run the kernel
+	kernel.save_state();
+
 	// Automatically delete memory of missing creeps
 	for (const name in Memory.creeps) {
 		if (!(name in Game.creeps)) {

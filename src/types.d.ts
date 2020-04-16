@@ -8,8 +8,19 @@ interface CreepMemory {
 }
 
 interface Memory {
-  uuid: number;
-  log: any;
+  //uuid: number;
+  //log: any;
+  kernel: KernelMemory;
+}
+
+interface KernelMemory {
+  version: string;
+  processes: { [key: string]: ProcessInfo };
+}
+
+interface ProcessInfo {
+  type: string;
+  pid: string;
 }
 
 // `global` extension samples
