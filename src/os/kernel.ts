@@ -1,4 +1,6 @@
-import { InitInfo } from "./processes/init";
+import { InitInfo, Init } from "./processes/init";
+import { Process } from "./processes/process";
+import { MinerLT } from "./processes/miner_lt";
 
 /**
 * Contains all Kernel level logic for managing processes, saving and loading state.
@@ -12,6 +14,8 @@ export class Kernel {
         if (!state) {
             this.boot();
         } else if (!state.processes) {
+            this.boot();
+        } else if (!state.processes['init']) {
             this.boot();
         }
         this.processes = Memory['kernel'].processes;
@@ -35,4 +39,25 @@ export class Kernel {
 
         Memory['kernel'] = state;
     }
+
+    public create_order(): ProcessInfo[] {
+        if (this.processes) {
+            return _.sortBy(this.processes, (info) => {
+                return 100 - info.priority;
+            });
+        }
+
+        return []
+    }
+
+    public run_process(info: ProcessInfo) {
+        console.log('running proc ' + info.pid);
+        let proc: Process = new proc_types[info.type](this, info);
+        proc.run();
+    }
+}
+
+const proc_types: { [key: string]: typeof Process } = {
+    'init': Init,
+    'miner_lt': MinerLT
 }

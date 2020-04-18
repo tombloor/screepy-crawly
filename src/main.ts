@@ -12,7 +12,13 @@ console.log('New global loaded');
 export const loop = ErrorMapper.wrapLoop(() => {
 	let kernel = new Kernel();
 	kernel.load_state();
-	// run the kernel
+	let execution_order = kernel.create_order();
+
+	while (execution_order.length > 0) {
+		let proc_info = execution_order.pop()!;
+		kernel.run_process(proc_info);
+	}
+
 	kernel.save_state();
 
 	// Automatically delete memory of missing creeps

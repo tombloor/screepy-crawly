@@ -7,7 +7,6 @@ import { Kernel } from "os/kernel";
 export class Process {
     kernel: Kernel;
     info: ProcessInfo;
-    type: string = 'base';
 
     constructor(kernel: Kernel, info: ProcessInfo) {
         this.kernel = kernel;
@@ -17,8 +16,13 @@ export class Process {
     /**
      * Fork a new process from this one
      */
-    fork() {
-
+    fork(info: ProcessInfo) {
+        let proc = this.kernel.processes![info.pid];
+        if (proc) {
+            console.log('process already exists ' + info.pid);
+        } else {
+            this.kernel.processes![info.pid] = info;
+        }
     }
 
     /**

@@ -21,6 +21,7 @@ interface KernelMemory {
 interface ProcessInfo {
   type: string;
   pid: string;
+  priority: number;
 }
 
 // `global` extension samples
