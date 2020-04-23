@@ -9,9 +9,18 @@ export class Init extends Process {
     }
 
     run() {
-        console.log('running init');
+        this.kernel.log('Running init');
+
+        this.kernel.log('Cleanup Memory');
+        for (const name in Memory.creeps) {
+            if (!(name in Game.creeps)) {
+                delete Memory.creeps[name];
+            }
+        }
+
         for (const room_name in Game.rooms) {
-            console.log(room_name);
+            this.kernel.log('Init room: ' + room_name);
+
             let r = Game.rooms[room_name];
             let controller = r.controller;
             let spawns = r.find(FIND_MY_SPAWNS);

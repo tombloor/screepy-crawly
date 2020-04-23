@@ -1,13 +1,21 @@
 import { InitInfo, Init } from "./processes/init";
 import { Process } from "./processes/process";
 import { MinerLT } from "./processes/miner_lt";
+import { Spawner } from "./processes/spawner";
 
 /**
 * Contains all Kernel level logic for managing processes, saving and loading state.
 */
 export class Kernel {
     version: string = '0.0.1';
+    debug: boolean = true;
     processes?: { [key: string]: ProcessInfo }
+
+    public log(message: string) {
+        if (this.debug) {
+            console.log(message);
+        }
+    }
 
     public load_state() {
         let state = Memory['kernel'];
@@ -59,5 +67,6 @@ export class Kernel {
 
 const proc_types: { [key: string]: typeof Process } = {
     'init': Init,
-    'miner_lt': MinerLT
+    'miner_lt': MinerLT,
+    'spawn': Spawner
 }

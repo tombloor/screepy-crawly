@@ -19,7 +19,7 @@ export class Process {
     fork(info: ProcessInfo) {
         let proc = this.kernel.processes![info.pid];
         if (proc) {
-            console.log('process already exists ' + info.pid);
+            this.kernel.log('process already exists ' + info.pid);
         } else {
             this.kernel.processes![info.pid] = info;
         }
@@ -31,5 +31,14 @@ export class Process {
      */
     run() {
         console.log('This should be overriden');
+    }
+
+    /**
+     * This process has done what it needed to to.
+     * Remove it from the kernel.
+     */
+    done() {
+        if (this.kernel.processes)
+            delete this.kernel.processes[this.info.pid];
     }
 }
