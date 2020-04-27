@@ -2,6 +2,13 @@ import { Process } from "./process";
 import { Kernel } from "os/kernel";
 import { MinerLTInfo } from "./miner_lt";
 
+/**
+ * Core process.
+ * runs housekeeping tasks and ensure that
+ * other vital processes are running.
+ *
+ * There must always be only one init process with the pid 'init'
+ */
 export class Init extends Process {
     constructor(kernel: Kernel) {
         let info = new InitInfo();

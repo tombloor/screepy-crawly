@@ -1,6 +1,9 @@
 import { Process } from "./process";
 import { Kernel } from "os/kernel";
 
+/**
+ * Process to handle spawning a single creep
+ */
 export class Spawner extends Process {
     info!: SpawnerInfo;
 
@@ -36,6 +39,12 @@ export class SpawnerInfo implements ProcessInfo {
     creep_name: string;
     body: BodyPartConstant[];
 
+    /**
+     *
+     * @param spawn_id ID of the spawn to use
+     * @param creep_name Name to assign to the creep
+     * @param body Body part array for the creep
+     */
     constructor(spawn_id: Id<StructureSpawn>, creep_name: string, body: BodyPartConstant[]) {
         this.pid = this.type + '_' + creep_name;
         this.priority = 90;

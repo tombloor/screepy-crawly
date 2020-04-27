@@ -2,6 +2,7 @@ import { InitInfo, Init } from "./processes/init";
 import { Process } from "./processes/process";
 import { MinerLT } from "./processes/miner_lt";
 import { Spawner } from "./processes/spawner";
+import { Move } from "./processes/move";
 
 /**
 * Contains all Kernel level logic for managing processes, saving and loading state.
@@ -68,5 +69,6 @@ export class Kernel {
 const proc_types: { [key: string]: typeof Process } = {
     'init': Init,
     'miner_lt': MinerLT,
-    'spawn': Spawner
+    'spawn': Spawner,
+    'move': Move
 }
